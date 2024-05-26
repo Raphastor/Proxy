@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Socket.IO Demo</title>
+  </head>
+  <style>
+    #jogoData 
+    {
+      border: 1px solid black;
+      width: 600px;
+      height: 500px;
+    }
+  </style>
+  <body>
+    <div id="mensagem"></div>
+    <span id="num-conexoes"></span>
+    <pre  id="jogoData" ></pre>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./JogoData.js"></script>
+    <script>     
+    
+      
+    
+
+      const socket = io("ws://177.138.254.219:3000/");
+      
+      
+      socket.on('atualizar_num_conexoes', (numConexoesAtivas) => {
+        const spanNumConexoes = document.getElementById('num-conexoes');
+        spanNumConexoes.innerText = numConexoesAtivas;  
+      });
+      
+      // socket.on('CriaPlayer', () => {
+      //   const player = new PlayerData(socket.id,"João", 10.0, 10.0, 10.0);
+      //   socket.emit('socketRecebeJogador', (player));        
+      //   console.log("Conole log = "+JSON.stringify(player, null, 2));
+      // });
+
+      
+      socket.on('CriaPlayer', function(jogoData) {    
+        //console.log(jogoData+ " ... "+ socket.id);    
+        
+        const player = new PlayerData(socket.id,"JogadorHTML", "Guerreiro", null, 0, 0.0);
+        //Object.assign(jogoDataServidor, JSON.parse(jogoData));
+        //jogoDataServidor.UpdatePlayer(jogoDataServidor, player);        
+        socket.emit('socketRecebeJogador', (player)); 
+      });
+
+
+      
+      socket.on('AtualizaCliente', function( jogoData) {           
+        console.log(jogoData+ " ... "+ socket.id);
+        //console.log(JSON.stringify(jogoData, null, 2));
+        const posicao = new Posicao(3.0, 0.0, 3.0);
+        //const rotacao = new Rotacao(0, 2.0, 0);
+        const player = new PlayerData(socket.id, "JogadorHTML", "Guerreiro",null, 1, posicao, 0);
+        //console.log(jogoData.playerData);
+        
+        // Imprime o JSON sem formatação na página da Web
+        //const pre = document.createElement('pre');
+        const pre = document.getElementById('jogoData');
+        // Converte o objeto em uma string JSON identada
+        pre.textContent = JSON.stringify(jogoData, null, 2); //remover após os testes
+        //document.body.appendChild(pre); 
+        socket.emit('socketRecebeJogador', (player));   
+      });
+      
+
+    </script>
+  </body>
+</html>
